@@ -13,7 +13,7 @@ public class User {
     @Column(unique = true)
     private String email;
     private String password;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
 
     public void setId(Long id) {

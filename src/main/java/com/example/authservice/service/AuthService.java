@@ -2,6 +2,7 @@ package com.example.authservice.service;
 
 import com.example.authservice.models.User;
 import com.example.authservice.repos.AuthRepo;
+import com.example.authservice.security.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,16 +13,19 @@ import java.util.Optional;
 public class AuthService {
     private AuthRepo authRepo;
     private PasswordEncoder passwordEncoder;
-    public AuthService(AuthRepo authRepo, PasswordEncoder passwordEncoder) {
+    private JwtUtil jwtUtil;
+    public AuthService(AuthRepo authRepo, PasswordEncoder passwordEncoder,JwtUtil jwtUtil) {
         this.authRepo = authRepo;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
     public String login(String email, String password) throws AuthenticationException {
         Optional<User> optionalUser = authRepo.findByEmail(email);
         if(optionalUser.isPresent()) {
             User user = optionalUser.get();
             if(passwordEncoder.matches(password, user.getPassword())) {
-                return "logged in";
+                String token = jwtUtil.generateToken(user.getEmail());
+                return token;
             }
 
         }
